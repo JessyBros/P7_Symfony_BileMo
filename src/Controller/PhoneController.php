@@ -12,8 +12,8 @@ class PhoneController extends AbstractController
     /**
      * @Route("/api/phones", name="phones", methods={"GET"})
      */
-    public function index(PhoneRepository $phoneRepository)
+    public function listPhones(PhoneRepository $phoneRepository): Response
     {
-        return $this->json($phoneRepository->findAll(),200, []);
+        return $this->json($phoneRepository->findAll(),200);
     }
 }
