@@ -14,7 +14,7 @@ class UserController extends AbstractController
      */
     public function listUsers(UserRepository $userRepository): Response
     {
-        return $this->json($userRepository->findAll(), 200, [], ['groups' => 'list_users']);
+        return $this->json($userRepository->findAll(), 200, [], ['groups' => 'show_users']);
     }
 
     /**
@@ -28,6 +28,6 @@ class UserController extends AbstractController
             throw $this->createNotFoundException("L'utilisateur " . $id ." n'a pas été trouvé !");
         }
 
-        return $this->json($user, 200, [], ['groups' => 'list_users']);
+        return $this->json($user, 200, [], ['groups' => 'show_users']);
     }
 }

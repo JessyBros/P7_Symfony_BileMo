@@ -16,25 +16,25 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups("list_users")
+     * @Groups("show_users")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("list_users")
+     * @Groups("show_users")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("list_users")
+     * @Groups("show_users")
      */
     private $email;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups("list_users")
+     * @Groups("show_users")
      */
     private $number;
 
