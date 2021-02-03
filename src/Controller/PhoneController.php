@@ -16,4 +16,18 @@ class PhoneController extends AbstractController
     {
         return $this->json($phoneRepository->findAll(),200);
     }
+
+    /**
+     * @Route("/api/phone/{id}", name="phone", methods={"GET"})
+     */
+    public function showPhone(int $id, PhoneRepository $phoneRepository)
+    {
+        $phone = $phoneRepository->findOneById($id);
+
+        if ($phone == null) {
+            throw $this->createNotFoundException("Le téléphone " . $id ." n'a pas été trouvé !");
+        }
+
+        return $this->json($phone,200);
+    }
 }
