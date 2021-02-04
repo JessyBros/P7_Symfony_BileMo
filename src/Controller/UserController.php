@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserController extends AbstractController
 {
@@ -40,7 +41,7 @@ class UserController extends AbstractController
     /**
      * @Route("/api/add_user", name="add_user", methods={"POST"})
      */
-    public function addUser(Request $request,SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customer)
+    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customer, ValidatorInterface $validator)
     {
         $idCustomer = $customer->findOneById(1);
         $jsonPost = $request->getContent();
@@ -48,6 +49,12 @@ class UserController extends AbstractController
         try {
             $post = $serializer->deserialize($jsonPost, User::class, 'json');
             $post->setCustomer($idCustomer);
+
+            $errors = $validator->validate($post);
+            if (count($errors) > 0) {
+                return $this->json($errors, 400);
+            }
+
             $manager->persist($post);
             
             $manager->flush();
