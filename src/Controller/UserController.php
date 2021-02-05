@@ -47,19 +47,19 @@ class UserController extends AbstractController
         $jsonPost = $request->getContent();
 
         try {
-            $post = $serializer->deserialize($jsonPost, User::class, 'json');
-            $post->setCustomer($customer);
+            $user = $serializer->deserialize($jsonPost, User::class, 'json');
+            $user->setCustomer($customer);
 
-            $errors = $validator->validate($post);
+            $errors = $validator->validate($user);
             if (count($errors) > 0) {
                 return $this->json($errors, 400);
             }
 
-            $manager->persist($post);
+            $manager->persist($user);
             
             $manager->flush();
 
-            return $this->json($post, 201, [], ['groups' => 'show_users']);
+            return $this->json($user, 201, [], ['groups' => 'show_users']);
         } catch (NotEncodableValueException $e) {
             return $this->json([
                 "status" => 400,
