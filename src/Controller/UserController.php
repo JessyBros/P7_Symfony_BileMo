@@ -41,30 +41,46 @@ class UserController extends AbstractController
     /**
      * @Route("/api/add_user", name="add_user", methods={"POST"})
      */
-    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customer, ValidatorInterface $validator)
+    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator)
     {
-        $idCustomer = $customer->findOneById(1);
+        $customer = $customerRepository->findOneById(1);
         $jsonPost = $request->getContent();
 
         try {
-            $post = $serializer->deserialize($jsonPost, User::class, 'json');
-            $post->setCustomer($idCustomer);
+            $user = $serializer->deserialize($jsonPost, User::class, 'json');
+            $user->setCustomer($customer);
 
-            $errors = $validator->validate($post);
+            $errors = $validator->validate($user);
             if (count($errors) > 0) {
                 return $this->json($errors, 400);
             }
 
-            $manager->persist($post);
+            $manager->persist($user);
             
             $manager->flush();
 
-            return $this->json($post, 201, [], ['groups' => 'show_users']);
+            return $this->json($user, 201, [], ['groups' => 'show_users']);
         } catch (NotEncodableValueException $e) {
             return $this->json([
                 "status" => 400,
                 "message" => $e->getMessage()
             ], 400);
         }
+    }
+
+    /**
+     * @Route("/api/delete_user/{id}", name="delete_user", methods={"DELETE"})
+     */
+    public function deleteUser($id, EntityManagerInterface $manager, UserRepository $userRepository)
+    {
+        $user = $userRepository->findOneById($id);
+
+        if ($user == null ) {
+            throw $this->createNotFoundException("L'utilisateur " . $id ." n'a pas été trouvé !");
+        }
+
+        $manager->remove($user);
+        $manager->flush();
+        return $this->json($user, 204, [], ['groups' => 'show_users']);
     }
 }
