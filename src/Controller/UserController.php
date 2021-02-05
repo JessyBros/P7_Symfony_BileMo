@@ -21,7 +21,7 @@ class UserController extends AbstractController
      */
     public function listUsers(UserRepository $userRepository): Response
     {
-        return $this->json($userRepository->findAll(), 200, [], ['groups' => 'show_users']);
+        return $this->json($userRepository->findAll(), Response::HTTP_OK, [], ['groups' => 'show_users']);
     }
 
     /**
@@ -35,20 +35,20 @@ class UserController extends AbstractController
             throw $this->createNotFoundException("L'utilisateur " . $id ." n'a pas été trouvé !");
         }
 
-        return $this->json($user, 200, [], ['groups' => 'show_users']);
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'show_users']);
     }
 
     /**
      * @Route("/api/add_user", name="add_user", methods={"POST"})
      */
-    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customer, ValidatorInterface $validator)
+    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator)
     {
-        $idCustomer = $customer->findOneById(1);
+        $customer = $customerRepository->findOneById(1);
         $jsonPost = $request->getContent();
 
         try {
             $post = $serializer->deserialize($jsonPost, User::class, 'json');
-            $post->setCustomer($idCustomer);
+            $post->setCustomer($customer);
 
             $errors = $validator->validate($post);
             if (count($errors) > 0) {
