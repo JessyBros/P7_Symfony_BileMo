@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UserController extends AbstractController
 {
     /**
-     * @Route("/api/users", name="users")
+     * @Route("/api/users", name="users", methods={"GET"})
      */
     public function listUsers(UserRepository $userRepository): Response
     {
@@ -25,21 +25,15 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/user/{id}", name="user", methods={"GET"})
+     * @Route("/api/users/{id<[0-9]+>}", name="user", methods={"GET"})
      */
-    public function showUser(int $id, UserRepository $userRepository)
+    public function showUser(User $user)
     {
-        $user = $userRepository->findOneById($id);
-
-        if ($user == null) {
-            throw $this->createNotFoundException("L'utilisateur " . $id ." n'a pas été trouvé !");
-        }
-
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'show_users']);
     }
 
     /**
-     * @Route("/api/add_user", name="add_user", methods={"POST"})
+     * @Route("/api/users", name="add_user", methods={"POST"})
      */
     public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator)
     {
@@ -52,19 +46,18 @@ class UserController extends AbstractController
 
             $errors = $validator->validate($user);
             if (count($errors) > 0) {
-                return $this->json($errors, 400);
+                return $this->json($errors, Response::HTTP_BAD_REQUEST);
             }
 
             $manager->persist($user);
-            
             $manager->flush();
+            return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'show_users']);
 
-            return $this->json($user, 201, [], ['groups' => 'show_users']);
         } catch (NotEncodableValueException $e) {
             return $this->json([
-                "status" => 400,
+                "status" => Response::HTTP_BAD_REQUEST,
                 "message" => $e->getMessage()
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
     }
 }
