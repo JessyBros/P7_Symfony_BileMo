@@ -30,7 +30,7 @@ class Customer
     private $email;
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer")
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
      */
     private $users;
 
