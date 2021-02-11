@@ -6,11 +6,12 @@ use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
  */
-class Customer
+class Customer implements UserInterface
 {
     /**
      * @ORM\Id
@@ -22,12 +23,22 @@ class Customer
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $email;
+
+    /**
+     * @ORM\Column(type="json")
+     */
+    private array $roles = [];
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $password;
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
@@ -44,14 +55,14 @@ class Customer
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getUsername(): ?string
     {
-        return $this->name;
+        return $this->username;
     }
 
-    public function setName(string $name): self
+    public function setUsername(string $username): self
     {
-        $this->name = $name;
+        $this->username = $username;
 
         return $this;
     }
@@ -64,6 +75,33 @@ class Customer
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getRoles(): ?array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(?string $password): self
+    {
+        $this->password = $password;
 
         return $this;
     }
@@ -96,5 +134,15 @@ class Customer
         }
 
         return $this;
+    }
+
+    public function eraseCredentials()
+    {
+        return null;
+    }
+
+    public function getSalt()
+    {
+        return null;
     }
 }
