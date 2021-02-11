@@ -15,11 +15,13 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-
+/**
+ * @Route("/api")
+ */
 class UserController extends AbstractController
 {
     /**
-     * @Route("/api/users", name="users", methods={"GET"})
+     * @Route("/users", name="users", methods={"GET"})
      */
     public function listUsers(UserRepository $userRepository, UserInterface $customer): Response
     {
@@ -27,7 +29,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/users/{id<[0-9]+>}", name="user", methods={"GET"})
+     * @Route("/users/{id<[0-9]+>}", name="user", methods={"GET"})
      */
     public function showUser(User $user, UserRepository $userRepository, UserInterface $customer)
     {
@@ -35,7 +37,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/users", name="add_user", methods={"POST"})
+     * @Route("/users", name="add_user", methods={"POST"})
      */
     public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator, UserInterface $customer)
     {
@@ -63,7 +65,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/users/{id}", name="delete_user", methods={"DELETE"})
+     * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
      */
     public function deleteUser(User $user, UserRepository $userRepository, UserInterface $customer, EntityManagerInterface $manager)
     {     

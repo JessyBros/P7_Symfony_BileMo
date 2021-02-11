@@ -11,10 +11,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\SecurityContext;
 
+/**
+ * @Route("/api")
+ */
 class PhoneController extends AbstractController
 {
     /**
-     * @Route("/api/phones", name="phones", methods={"GET"})
+     * @Route("/phones", name="phones", methods={"GET"})
      */
     public function listPhones(PhoneRepository $phoneRepository, Request $request): Response
     {
@@ -22,7 +25,7 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @Route("/api/phones/{id}", name="phone", methods={"GET"})
+     * @Route("/phones/{id}", name="phone", methods={"GET"})
      */
     public function showPhone(Phone $phone)
     {
