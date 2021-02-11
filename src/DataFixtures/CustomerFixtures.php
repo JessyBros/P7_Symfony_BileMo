@@ -18,13 +18,20 @@ class CustomerFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        $customer = new Customer();
-        $customer->setUsername("Smartfox")
+        $customerSmartfox = new Customer();
+        $customerSmartfox->setUsername("Smartfox")
             ->setEmail("contact@smartfox.com")
-            ->setPassword($this->passwordEncoder->encodePassword($customer,'smartfoxPassword'));
-        $manager->persist($customer);
+            ->setPassword($this->passwordEncoder->encodePassword($customerSmartfox,'SmartfoxPassword'));
+        $manager->persist($customerSmartfox);
+
+        $customerKokoBeats = new Customer();
+        $customerKokoBeats->setUsername("KokoBeats")
+            ->setEmail("contact@kokobeats.com")
+            ->setPassword($this->passwordEncoder->encodePassword($customerKokoBeats,'KokoBeatsPassword'));
+        $manager->persist($customerKokoBeats);
 
         $manager->flush();
-        $this->addReference('customerSmartfox', $customer);
+        $this->addReference('customerSmartfox', $customerSmartfox);
+        $this->addReference('customerKokoBeats', $customerKokoBeats);
     }
 }

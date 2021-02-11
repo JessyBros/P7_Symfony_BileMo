@@ -18,9 +18,7 @@ class PhoneController extends AbstractController
      */
     public function listPhones(PhoneRepository $phoneRepository, Request $request): Response
     {
-        dump($request->getContent()['username']);
         return $this->json($phoneRepository->findAll(),Response::HTTP_OK);
-        
     }
 
     /**

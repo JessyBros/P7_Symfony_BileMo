@@ -10,34 +10,35 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 class UserController extends AbstractController
 {
     /**
      * @Route("/api/users", name="users", methods={"GET"})
      */
-    public function listUsers(UserRepository $userRepository): Response
+    public function listUsers(UserRepository $userRepository, UserInterface $customer): Response
     {
-        return $this->json($userRepository->findAll(), Response::HTTP_OK, [], ['groups' => 'show_users']);
+        return $this->json($userRepository->findBy(["customer" => $customer]), Response::HTTP_OK, [], ['groups' => 'show_users']);
     }
 
     /**
      * @Route("/api/users/{id<[0-9]+>}", name="user", methods={"GET"})
      */
-    public function showUser(User $user)
+    public function showUser(User $user, UserRepository $userRepository, UserInterface $customer)
     {
-        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'show_users']);
+        return $this->json($userRepository->findOneBy(["id" => $user,"customer" => $customer]), Response::HTTP_OK, [], ['groups' => 'show_users']);
     }
 
     /**
      * @Route("/api/users", name="add_user", methods={"POST"})
      */
-    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator)
+    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator, UserInterface $customer)
     {
-        $customer = $customerRepository->findOneById(1);
         $jsonPost = $request->getContent();
 
         try {
@@ -64,10 +65,19 @@ class UserController extends AbstractController
     /**
      * @Route("/api/users/{id}", name="delete_user", methods={"DELETE"})
      */
-    public function deleteUser(User $user, EntityManagerInterface $manager)
+    public function deleteUser(User $user, UserRepository $userRepository, UserInterface $customer, EntityManagerInterface $manager)
     {     
+        $userFromCustomer = $userRepository->findOneBy(['id' => $user, 'customer' => $customer]);
+
+        if (!$userFromCustomer) {
+            return $this->json([
+                "status" => Response::HTTP_BAD_REQUEST,
+                "message" => "Erreur lors de la suppresion de l'utilisateur"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $manager->remove($user);
         $manager->flush();
-        return $this->json($user, Response::HTTP_NO_CONTENT, [], ['groups' => 'show_users']);        
+        return $this->json($user, Response::HTTP_NO_CONTENT, [], ['groups' => 'show_users']);
     }
 }
