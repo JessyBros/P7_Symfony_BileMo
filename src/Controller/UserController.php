@@ -25,7 +25,7 @@ class UserController extends AbstractController
      */
     public function listUsers(UserRepository $userRepository, UserInterface $customer): Response
     {
-        return $this->json($userRepository->findBy(["customer" => $customer]), Response::HTTP_OK, [], ['groups' => 'show_users']);
+        return $this->json($userRepository->findBy(["customer" => $customer]), Response::HTTP_OK, [], ['groups' => 'list_users']);
     }
 
     /**

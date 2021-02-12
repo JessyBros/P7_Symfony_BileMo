@@ -22,13 +22,13 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups("show_users")
+     * @Groups({"list_users,show_users"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("show_users")
+     * @Groups({"list_users,show_users"})
      * @Assert\NotBlank
      * @Assert\Length(
      *      min = 3,
