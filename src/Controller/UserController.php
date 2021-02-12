@@ -80,6 +80,6 @@ class UserController extends AbstractController
 
         $manager->remove($user);
         $manager->flush();
-        return $this->json($user, Response::HTTP_NO_CONTENT, [], ['groups' => 'show_users']);
+        return $this->json(null,Response::HTTP_NO_CONTENT);
     }
 }
