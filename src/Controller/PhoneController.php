@@ -22,7 +22,7 @@ class PhoneController extends AbstractController
      */
     public function listPhones(PhoneRepository $phoneRepository, Request $request): Response
     {
-        return $this->json($phoneRepository->findAll(),Response::HTTP_OK, [], ["groups" => "list_phones"]);
+        return $this->json($phoneRepository->findAll(), Response::HTTP_OK, [], ['groups' => 'list_phones']);
     }
 
     /**
@@ -30,6 +30,6 @@ class PhoneController extends AbstractController
      */
     public function showPhone(Phone $phone)
     {
-        return $this->json($phone,Response::HTTP_OK, [], ["groups" => "show_phones"]);
+        return $this->json($phone, Response::HTTP_OK, [], ['groups' => 'show_phones']);
     }
 }
