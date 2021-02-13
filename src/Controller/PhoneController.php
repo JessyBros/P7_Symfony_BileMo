@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Customer;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
-use ContainerPuP5l9S\PaginatorInterface_82dac15;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,8 +34,12 @@ class PhoneController extends AbstractController
             $request->query->getInt('page', 1),
             10
         );
-       
-        return $this->json($phones, Response::HTTP_OK, [], ['groups' => 'list_phones']);
+        
+        $response = $this->json($phones, Response::HTTP_OK, [], ['groups' => 'list_phones']);
+
+        $response->setPublic;
+        $response->setMaxAge(3600);
+        return $response;
     }
 
     /**
