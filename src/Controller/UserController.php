@@ -26,6 +26,13 @@ class UserController extends AbstractController
      */
     public function listUsers(UserRepository $userRepository, UserInterface $customer,Request $request, PaginatorInterface $paginator): Response
     {
+        if ($userRepository->findBy(["customer" => $customer])) {
+            return $this->json([
+                "status" => Response::HTTP_BAD_REQUEST,
+                "message" => "Vous n'avez aucun utilisateur !"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $users = $paginator->paginate(
             $userRepository->findBy(["customer" => $customer]),
             $request->query->getInt('page', 1),
@@ -72,7 +79,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
+     * @Route("/users/{id<[0-9]+>}", name="delete_user", methods={"DELETE"})
      */
     public function deleteUser(User $user, UserRepository $userRepository, UserInterface $customer, EntityManagerInterface $manager)
     {     
