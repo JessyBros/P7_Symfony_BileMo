@@ -23,17 +23,24 @@ class PhoneController extends AbstractController
      */
     public function listPhones(PhoneRepository $phoneRepository, Request $request, PaginatorInterface $paginator): Response
     {
+        if (!$phoneRepository->findAll()) {
+            return $this->json([
+                "status" => Response::HTTP_BAD_REQUEST,
+                "message" => "Aucun téléphone n'existe"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $phones = $paginator->paginate(
             $phoneRepository->findAll(),
             $request->query->getInt('page', 1),
             10
         );
-
+       
         return $this->json($phones, Response::HTTP_OK, [], ['groups' => 'list_phones']);
     }
 
     /**
-     * @Route("/phones/{id}", name="phone", methods={"GET"})
+     * @Route("/phones/{id<[0-9]+>}", name="phone", methods={"GET"})
      */
     public function showPhone(Phone $phone)
     {
