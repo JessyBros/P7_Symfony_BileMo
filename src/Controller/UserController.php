@@ -23,6 +23,8 @@ use Knp\Component\Pager\PaginatorInterface;
  */
 class UserController extends AbstractController
 {
+    const LIMIT_MAX_BY_PAGE = 5;
+
     /**
      * @Route("/users", name="users", methods={"GET"})
      */
@@ -31,7 +33,7 @@ class UserController extends AbstractController
         $users = $paginator->paginate(
             $userRepository->findBy(["customer" => $customer]),
             $request->query->getInt('page', 1),
-            5
+            self::LIMIT_MAX_BY_PAGE
         );
         
         return $this->json($users, Response::HTTP_OK, [], ['groups' => 'list_users']);

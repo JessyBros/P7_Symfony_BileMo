@@ -18,6 +18,8 @@ use Knp\Component\Pager\PaginatorInterface;
  */
 class PhoneController extends AbstractController
 {
+    const LIMIT_MAX_BY_PAGE = 10;
+
     /**
      * @Route("/phones", name="phones", methods={"GET"})
      */
@@ -26,7 +28,7 @@ class PhoneController extends AbstractController
         $phones = $paginator->paginate(
             $phoneRepository->findAll(),
             $request->query->getInt('page', 1),
-            10
+            self::LIMIT_MAX_BY_PAGE
         );
 
         return $this->json($phones, Response::HTTP_OK, [], ['groups' => 'list_phones']);
