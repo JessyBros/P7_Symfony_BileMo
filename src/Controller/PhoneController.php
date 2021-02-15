@@ -17,27 +17,22 @@ use Knp\Component\Pager\PaginatorInterface;
  */
 class PhoneController extends AbstractController
 {
+    const LIMIT_MAX_BY_PAGE = 10;
+
     /**
      * @Route("/phones", name="phones", methods={"GET"})
      */
     public function listPhones(PhoneRepository $phoneRepository, Request $request, PaginatorInterface $paginator): Response
     {
-        if (!$phoneRepository->findAll()) {
-            return $this->json([
-                "status" => Response::HTTP_BAD_REQUEST,
-                "message" => "Aucun téléphone n'existe"
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
         $phones = $paginator->paginate(
             $phoneRepository->findAll(),
             $request->query->getInt('page', 1),
-            10
+            self::LIMIT_MAX_BY_PAGE
         );
         
         $response = $this->json($phones, Response::HTTP_OK, [], ['groups' => 'list_phones']);
 
-        $response->setPublic;
+        $response->setPublic();
         $response->setMaxAge(3600);
         return $response;
     }

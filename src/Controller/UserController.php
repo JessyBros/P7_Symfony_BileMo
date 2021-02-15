@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,27 +17,23 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
+
 /**
  * @Route("/api")
  */
 class UserController extends AbstractController
 {
+    const LIMIT_MAX_BY_PAGE = 5;
+
     /**
      * @Route("/users", name="users", methods={"GET"})
      */
-    public function listUsers(UserRepository $userRepository, UserInterface $customer,Request $request, PaginatorInterface $paginator): Response
+    public function listUsers(UserRepository $userRepository, UserInterface $customer, Request $request, PaginatorInterface $paginator): Response
     {
-        if ($userRepository->findBy(["customer" => $customer])) {
-            return $this->json([
-                "status" => Response::HTTP_BAD_REQUEST,
-                "message" => "Vous n'avez aucun utilisateur !"
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
         $users = $paginator->paginate(
             $userRepository->findBy(["customer" => $customer]),
             $request->query->getInt('page', 1),
-            5
+            self::LIMIT_MAX_BY_PAGE
         );
         
         return $this->json($users, Response::HTTP_OK, [], ['groups' => 'list_users']);
@@ -44,10 +41,11 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id<[0-9]+>}", name="user", methods={"GET"})
+     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
      */
-    public function showUser(User $user, UserRepository $userRepository, UserInterface $customer)
+    public function showUser(User $user, UserRepository $userRepository)
     {
-        return $this->json($userRepository->findOneBy(["id" => $user,"customer" => $customer]), Response::HTTP_OK, [], ['groups' => 'show_users']);
+        return $this->json($userRepository->findOneBy(["id" => $user]), Response::HTTP_OK, [], ['groups' => 'show_users']);
     }
 
     /**
@@ -80,18 +78,10 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id<[0-9]+>}", name="delete_user", methods={"DELETE"})
+     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
      */
-    public function deleteUser(User $user, UserRepository $userRepository, UserInterface $customer, EntityManagerInterface $manager)
-    {     
-        $userFromCustomer = $userRepository->findOneBy(['id' => $user, 'customer' => $customer]);
-
-        if (!$userFromCustomer) {
-            return $this->json([
-                "status" => Response::HTTP_BAD_REQUEST,
-                "message" => "Erreur lors de la suppresion de l'utilisateur"
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
+    public function deleteUser(User $user, EntityManagerInterface $manager)
+    { 
         $manager->remove($user);
         $manager->flush();
         return $this->json(null,Response::HTTP_NO_CONTENT);
