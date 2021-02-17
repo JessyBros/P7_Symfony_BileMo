@@ -28,7 +28,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="users", methods={"GET"})
      */
-    public function listUsers(UserRepository $userRepository, UserInterface $customer,Request $request, PaginatorInterface $paginator): Response
+    public function listUsers(UserRepository $userRepository, UserInterface $customer, Request $request, PaginatorInterface $paginator): Response
     {
         $users = $paginator->paginate(
             $userRepository->findBy(["customer" => $customer]),
@@ -77,7 +77,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
+     * @Route("/users/{id<[0-9]+>}", name="delete_user", methods={"DELETE"})
      * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
      */
     public function deleteUser(User $user, EntityManagerInterface $manager)

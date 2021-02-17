@@ -1,6 +1,7 @@
 <?php
 
 use App\Kernel;
+use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +17,12 @@ if ($_SERVER['APP_DEBUG']) {
 }
 
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+if ('prod' === $kernel->getEnvironment()) {
+        $kernel = new HttpCache($kernel);
+    }
+    
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
+
