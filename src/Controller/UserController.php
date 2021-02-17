@@ -6,38 +6,44 @@ use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+
+/**
+ * @Route("/api")
+ */
 class UserController extends AbstractController
 {
     /**
-     * @Route("/api/users", name="users", methods={"GET"})
+     * @Route("/users", name="users", methods={"GET"})
      */
-    public function listUsers(UserRepository $userRepository): Response
+    public function listUsers(UserRepository $userRepository, UserInterface $customer): Response
     {
-        return $this->json($userRepository->findAll(), Response::HTTP_OK, [], ['groups' => 'show_users']);
+        return $this->json($userRepository->findBy(["customer" => $customer]), Response::HTTP_OK, [], ['groups' => 'list_users']);
     }
 
     /**
-     * @Route("/api/users/{id<[0-9]+>}", name="user", methods={"GET"})
+     * @Route("/users/{id<[0-9]+>}", name="user", methods={"GET"})
+     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
      */
-    public function showUser(User $user)
+    public function showUser(User $user, UserRepository $userRepository)
     {
-        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'show_users']);
+        return $this->json($userRepository->findOneBy(["id" => $user]), Response::HTTP_OK, [], ['groups' => 'show_users']);
     }
 
     /**
-     * @Route("/api/users", name="add_user", methods={"POST"})
+     * @Route("/users", name="add_user", methods={"POST"})
      */
-    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator)
+    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator, UserInterface $customer)
     {
-        $customer = $customerRepository->findOneById(1);
         $jsonPost = $request->getContent();
 
         try {
@@ -62,12 +68,13 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/users/{id}", name="delete_user", methods={"DELETE"})
+     * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
+     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
      */
     public function deleteUser(User $user, EntityManagerInterface $manager)
-    {     
+    { 
         $manager->remove($user);
         $manager->flush();
-        return $this->json($user, Response::HTTP_NO_CONTENT, [], ['groups' => 'show_users']);        
+        return $this->json(null,Response::HTTP_NO_CONTENT);
     }
 }

@@ -13,12 +13,20 @@ class UserFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        for ($i = 1; $i < 16; $i++) {
+        for ($i = 0; $i < 12; $i++) {
             $user = new User();
             $user->setName($faker->name())
                 ->setEmail($faker->email())
                 ->setNumber($faker->serviceNumber())
                 ->setCustomer($this->getReference('customerSmartfox'));
+            $manager->persist($user);
+        }
+        for ($i = 0; $i < 7; $i++) {
+            $user = new User();
+            $user->setName($faker->name())
+                ->setEmail($faker->email())
+                ->setNumber($faker->serviceNumber())
+                ->setCustomer($this->getReference('customerKokoBeats'));
             $manager->persist($user);
         }
         
