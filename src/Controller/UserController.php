@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
 
 /**
@@ -22,12 +23,20 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class UserController extends AbstractController
 {
+    const LIMIT_MAX_BY_PAGE = 5;
+
     /**
      * @Route("/users", name="users", methods={"GET"})
      */
-    public function listUsers(UserRepository $userRepository, UserInterface $customer): Response
+    public function listUsers(UserRepository $userRepository, UserInterface $customer,Request $request, PaginatorInterface $paginator): Response
     {
-        return $this->json($userRepository->findBy(["customer" => $customer]), Response::HTTP_OK, [], ['groups' => 'list_users']);
+        $users = $paginator->paginate(
+            $userRepository->findBy(["customer" => $customer]),
+            $request->query->getInt('page', 1),
+            self::LIMIT_MAX_BY_PAGE
+        );
+        
+        return $this->json($users, Response::HTTP_OK, [], ['groups' => 'list_users']);
     }
 
     /**
