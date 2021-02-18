@@ -89,17 +89,6 @@ class UserController extends AbstractController
     { 
         $manager->remove($user);
         $manager->flush();
-        return $this->json(null,Response::HTTP_NO_CONTENT);
+        return new Response(null, Response::HTTP_NO_CONTENT);
     }
 }
-
-/*{
-    "username": "Smartfox",
-    "password": "SmartfoxPassword"
-} 
-
-{
-    "name": "Sabine Breton",
-    "email": "michelle39@noos.fr",
-    "number": "08 08 49 54 02"
-}*/
