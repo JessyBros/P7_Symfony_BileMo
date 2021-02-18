@@ -6,6 +6,7 @@ use App\Entity\Customer;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,7 +32,7 @@ class PhoneController extends AbstractController
             self::LIMIT_MAX_BY_PAGE
         );
 
-        $phones = $serializer->serialize($phones, 'json');
+        $phones = $serializer->serialize($phones, 'json', SerializationContext::create()->setGroups(array('Default', 'items' => array('list_phones'))));
         $response =  new JsonResponse($phones, Response::HTTP_OK, [], true);
 
         $response->setPublic();
@@ -44,7 +45,7 @@ class PhoneController extends AbstractController
      */
     public function showPhone(Phone $phone, SerializerInterface $serializer)
     {
-        $phone = $serializer->serialize($phone, 'json');
+        $phone = $serializer->serialize($phone, 'json', SerializationContext::create()->setGroups(array('show_phones')));
         $response =  new JsonResponse($phone, Response::HTTP_OK, [], true);
         $response->setPublic();
         $response->setMaxAge(3600);
