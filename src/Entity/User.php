@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -17,6 +18,52 @@ use Symfony\Component\Validator\Constraints as Assert;
  *  fields={"email"},
  *  message = "L'email que vous indiqué est déjà utilisé !"
  * )
+ * 
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "user",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"list_users", "add_user"}
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "list",
+ *      href = @Hateoas\Route(
+ *          "users",
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"show_users", "add_user"}
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "create",
+ *      href = @Hateoas\Route(
+ *          "add_user",
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"list_users", "show_users"}
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "remove",
+ *      href = @Hateoas\Route(
+ *          "delete_user",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"list_users", "show_users", "add_user"}
+ *      )
+ * )
  */
 class User
 {
@@ -24,13 +71,13 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Serializer\Groups({"list_users", "show_users"})
+     * @Serializer\Groups({"list_users", "show_users", "add_user"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Serializer\Groups({"list_users", "show_users"})
+     * @Serializer\Groups({"list_users", "show_users", "add_user"})
      * @Assert\NotBlank
      * @Assert\Length(
      *      min = 3,
@@ -42,7 +89,7 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Serializer\Groups({"show_users"})
+     * @Serializer\Groups({"show_users", "add_user"})
      * @Assert\NotBlank
      * @Assert\Email(
      *     message = "Votre email '{{ value }}' n'est pas un email valid."
@@ -52,7 +99,7 @@ class User
 
     /**
      * @ORM\Column(type="text")
-     * @Serializer\Groups({"show_users"})
+     * @Serializer\Groups({"show_users", "add_user"})
      * @Assert\NotBlank
      * @Assert\Positive
      */

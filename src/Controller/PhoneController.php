@@ -24,7 +24,7 @@ class PhoneController extends AbstractController
     /**
      * @Route("/phones", name="phones", methods={"GET"})
      */
-    public function listPhones(PhoneRepository $phoneRepository, Request $request, PaginatorInterface $paginator, SerializerInterface $serializer): Response
+    public function listPhones(PhoneRepository $phoneRepository, Request $request, PaginatorInterface $paginator, SerializerInterface $serializer)
     {
         $phones = $paginator->paginate(
             $phoneRepository->findAll(),

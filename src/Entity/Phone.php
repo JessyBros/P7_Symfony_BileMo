@@ -16,7 +16,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *      "self",
  *      href = @Hateoas\Route(
  *          "phone",
- *          parameters = { "id" = "expr(object.getId())" }
+ *          parameters = { "id" = "expr(object.getId())" },
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"list_phones"}
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "list",
+ *      href = @Hateoas\Route(
+ *          "phones",
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"show_phones"}
  *      )
  * )
  */

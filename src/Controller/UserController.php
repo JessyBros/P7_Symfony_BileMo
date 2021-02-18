@@ -29,7 +29,11 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="users", methods={"GET"})
      */
-    public function listUsers(UserRepository $userRepository, UserInterface $customer, Request $request, PaginatorInterface $paginator, SerializerInterface $serializer): Response
+    public function listUsers(UserRepository $userRepository,
+                              UserInterface $customer,
+                              Request $request,
+                              PaginatorInterface $paginator,
+                              SerializerInterface $serializer)
     {
         $users = $paginator->paginate(
             $userRepository->findBy(["customer" => $customer]),
@@ -54,7 +58,12 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="add_user", methods={"POST"})
      */
-    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator, UserInterface $customer)
+    public function addUser(Request $request,
+                            SerializerInterface $serializer,
+                            EntityManagerInterface $manager,
+                            CustomerRepository $customerRepository,
+                            ValidatorInterface $validator,
+                            UserInterface $customer)
     {
         $jsonPost = $request->getContent();
 
@@ -70,7 +79,7 @@ class UserController extends AbstractController
 
             $manager->persist($user);
             $manager->flush();
-            $user = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups('show_users'));
+            $user = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups('add_user'));
             return new JsonResponse($user, Response::HTTP_CREATED, [], true);
 
         } catch (NotEncodableValueException $e) {
