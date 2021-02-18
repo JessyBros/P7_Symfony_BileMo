@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -22,13 +24,13 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"list_users", "show_users"})
+     * @Serializer\Groups({"list_users", "show_users"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"list_users", "show_users"})
+     * @Serializer\Groups({"list_users", "show_users"})
      * @Assert\NotBlank
      * @Assert\Length(
      *      min = 3,
@@ -40,7 +42,7 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("show_users")
+     * @Serializer\Groups({"show_users"})
      * @Assert\NotBlank
      * @Assert\Email(
      *     message = "Votre email '{{ value }}' n'est pas un email valid."
@@ -50,7 +52,7 @@ class User
 
     /**
      * @ORM\Column(type="text")
-     * @Groups("show_users")
+     * @Serializer\Groups({"show_users"})
      * @Assert\NotBlank
      * @Assert\Positive
      */
