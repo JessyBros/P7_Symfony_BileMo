@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
-use Symfony\Component\Serializer\SerializerInterface as Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
@@ -55,7 +54,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="add_user", methods={"POST"})
      */
-    public function addUser(Request $request, Serializer $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator, UserInterface $customer)
+    public function addUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, CustomerRepository $customerRepository, ValidatorInterface $validator, UserInterface $customer)
     {
         $jsonPost = $request->getContent();
 
@@ -65,12 +64,14 @@ class UserController extends AbstractController
 
             $errors = $validator->validate($user);
             if (count($errors) > 0) {
-                return $this->json($errors, Response::HTTP_BAD_REQUEST);
+                $errors = $serializer->serialize($errors, 'json');
+                return new JsonResponse($errors, Response::HTTP_BAD_REQUEST, [], true);
             }
 
             $manager->persist($user);
             $manager->flush();
-            return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'show_users']);
+            $user = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups('show_users'));
+            return new JsonResponse($user, Response::HTTP_CREATED, [], true);
 
         } catch (NotEncodableValueException $e) {
             return $this->json([
@@ -91,3 +92,14 @@ class UserController extends AbstractController
         return $this->json(null,Response::HTTP_NO_CONTENT);
     }
 }
+
+/*{
+    "username": "Smartfox",
+    "password": "SmartfoxPassword"
+} 
+
+{
+    "name": "Sabine Breton",
+    "email": "michelle39@noos.fr",
+    "number": "08 08 49 54 02"
+}*/
