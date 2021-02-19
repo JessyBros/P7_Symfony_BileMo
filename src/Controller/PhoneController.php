@@ -17,7 +17,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
-
 /**
  * @Route("/api")
  */
@@ -28,7 +27,11 @@ class PhoneController extends AbstractController
     /**
      * @Route("/phones", name="phones", methods={"GET"})
      */
-    public function listPhones(PhoneRepository $phoneRepository, Request $request, PaginatorInterface $paginator, SerializerInterface $serializer, ShowPagination $pagination)
+    public function listPhones(PhoneRepository $phoneRepository,
+                               Request $request,
+                               PaginatorInterface $paginator,
+                               SerializerInterface $serializer,
+                               ShowPagination $pagination)
     {
         $phones = $paginator->paginate(
             $phoneRepository->findAll(),
@@ -44,16 +47,10 @@ class PhoneController extends AbstractController
         $pagination = $pagination->showPagination($route, $page, $totalPhoneCount, $maxPage);
         $phones[] = ["Pagination" => $pagination];
 
-
         $phones = $serializer->serialize($phones, 'json', SerializationContext::create()->setGroups(array('Default', 'items' => array('list_phones'))));
-        
-
-        
         $response =  new JsonResponse($phones, Response::HTTP_OK, [], true);
 
-        $response->setPublic();
-        $response->setMaxAge(3600);
-        return $response;
+        return $response->setPublic()->setMaxAge(3600);
     }
 
     /**
@@ -63,8 +60,6 @@ class PhoneController extends AbstractController
     {
         $phone = $serializer->serialize($phone, 'json', SerializationContext::create()->setGroups(array('show_phones')));
         $response =  new JsonResponse($phone, Response::HTTP_OK, [], true);
-        $response->setPublic();
-        $response->setMaxAge(3600);
-        return $response;
+        return $response->setPublic()->setMaxAge(3600);
     }
 }

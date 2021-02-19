@@ -20,7 +20,6 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
-
 /**
  * @Route("/api")
  */
@@ -44,16 +43,17 @@ class UserController extends AbstractController
             self::LIMIT_MAX_BY_PAGE
         );
 
+        // Make Link pagination
         $route = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
         $page = $users->getCurrentPageNumber(); 
         $totalPhoneCount = $users->getTotalItemCount();
-        $maxPage = ceil($totalPhoneCount/ self::LIMIT_MAX_BY_PAGE);
+        $maxPage = ceil($totalPhoneCount / self::LIMIT_MAX_BY_PAGE);
 
         $pagination = $pagination->showPagination($route, $page, $totalPhoneCount, $maxPage);
         $users[] = ["Pagination" => $pagination];
 
         $users = $serializer->serialize($users, 'json', SerializationContext::create()->setGroups(array('Default', 'items' => array('list_users'))));
-        return  new JsonResponse($users, Response::HTTP_OK,[], true);
+        return  new JsonResponse($users, Response::HTTP_OK, [], true);
     }
 
     /**
@@ -97,7 +97,7 @@ class UserController extends AbstractController
             return $this->json([
                 "status" => Response::HTTP_BAD_REQUEST,
                 "message" => $e->getMessage()
-            ],Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_BAD_REQUEST);
         }
     }
 
