@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
+use App\Service\ShowPagination;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Knp\Component\Pager\PaginatorInterface;
+
 
 /**
  * @Route("/api")
@@ -33,13 +35,22 @@ class UserController extends AbstractController
                               UserInterface $customer,
                               Request $request,
                               PaginatorInterface $paginator,
-                              SerializerInterface $serializer)
+                              SerializerInterface $serializer,
+                              ShowPagination $pagination)
     {
         $users = $paginator->paginate(
             $userRepository->findBy(["customer" => $customer]),
             $request->query->getInt('page', 1),
             self::LIMIT_MAX_BY_PAGE
         );
+
+        $route = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
+        $page = $users->getCurrentPageNumber(); 
+        $totalPhoneCount = $users->getTotalItemCount();
+        $maxPage = ceil($totalPhoneCount/ self::LIMIT_MAX_BY_PAGE);
+
+        $pagination = $pagination->showPagination($route, $page, $totalPhoneCount, $maxPage);
+        $users[] = ["Pagination" => $pagination];
 
         $users = $serializer->serialize($users, 'json', SerializationContext::create()->setGroups(array('Default', 'items' => array('list_users'))));
         return  new JsonResponse($users, Response::HTTP_OK,[], true);
@@ -86,7 +97,7 @@ class UserController extends AbstractController
             return $this->json([
                 "status" => Response::HTTP_BAD_REQUEST,
                 "message" => $e->getMessage()
-            ], );
+            ],Response::HTTP_BAD_REQUEST);
         }
     }
 
