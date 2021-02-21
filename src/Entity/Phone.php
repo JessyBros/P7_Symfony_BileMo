@@ -4,11 +4,13 @@ namespace App\Entity;
 
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
+ * 
  */
 class Phone
 {
@@ -17,42 +19,43 @@ class Phone
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"list_phones", "show_phones"})
+     * @Serializer\Groups({"list_phones", "show_phones"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"list_phones", "show_phones"})
+     * @Serializer\Groups({"list_phones", "show_phones"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("show_phones")
+     * @Serializer\Groups({"show_phones"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="decimal", precision=6, scale=2)
-     * @Groups("show_phones")
+     * @Serializer\Groups({"show_phones"})
      */
     private $price;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("show_phones")
+     * @Serializer\Groups({"show_phones"})
      */
     private $color;
 
     /**
      * @ORM\Column(type="decimal", precision=5, scale=2)
-     * @Groups("show_phones")
+     * @Serializer\Groups({"show_phones"})
      */
     private $size;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups("show_phones")
+     * @Serializer\Groups({"show_phones"})
      */
     private $weight;
 
