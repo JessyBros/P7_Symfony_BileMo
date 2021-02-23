@@ -5,16 +5,14 @@ namespace App\Controller;
 use App\Entity\Customer;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
-use App\Service\ShowPagination;
+use App\Service\KngPagination;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
 /**
@@ -22,32 +20,16 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
  */
 class PhoneController extends AbstractController
 {
-    const LIMIT_MAX_BY_PAGE = 10;
+    const NUM_PHONES_PER_PAGE = 8;
+    const GROUP_JMS_LIST_PHONES = "list_phones";
 
     /**
      * @Route("/phones", name="phones", methods={"GET"})
      */
-    public function listPhones(PhoneRepository $phoneRepository,
-                               Request $request,
-                               PaginatorInterface $paginator,
-                               SerializerInterface $serializer,
-                               ShowPagination $pagination)
+    public function listPhones(PhoneRepository $phoneRepository, SerializerInterface $serializer, KngPagination $knpPagination)
     {
-        $phones = $paginator->paginate(
-            $phoneRepository->findAll(),
-            $request->query->getInt('page', 1),
-            self::LIMIT_MAX_BY_PAGE,[],   
-        );
-
-        $route = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
-        $page = $phones->getCurrentPageNumber(); 
-        $totalPhoneCount = $phones->getTotalItemCount();
-        $maxPage = ceil($totalPhoneCount/ self::LIMIT_MAX_BY_PAGE);
-
-        $pagination = $pagination->showPagination($route, $page, $totalPhoneCount, $maxPage);
-        $phones[] = ["Pagination" => $pagination];
-
-        $phones = $serializer->serialize($phones, 'json', SerializationContext::create()->setGroups(array('Default', 'items' => array('list_phones'))));
+        $phones = $knpPagination->showPagination($phoneRepository->findAll(), self::NUM_PHONES_PER_PAGE, self::GROUP_JMS_LIST_PHONES);
+        $phones = $serializer->serialize($phones, 'json');
         $response =  new JsonResponse($phones, Response::HTTP_OK, [], true);
 
         return $response->setPublic()->setMaxAge(3600);

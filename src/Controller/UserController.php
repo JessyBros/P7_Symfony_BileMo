@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
-use App\Service\ShowPagination;
+use App\Service\KngPagination;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -19,40 +19,23 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/api")
  */
 class UserController extends AbstractController
 {
-    const LIMIT_MAX_BY_PAGE = 5;
+    const NUM_USERS_PER_PAGE = 5;
+    const GROUP_JMS_LIST_USERS = "list_users";
 
     /**
      * @Route("/users", name="users", methods={"GET"})
      */
-    public function listUsers(UserRepository $userRepository,
-                              UserInterface $customer,
-                              Request $request,
-                              PaginatorInterface $paginator,
-                              SerializerInterface $serializer,
-                              ShowPagination $pagination)
+    public function listUsers(UserRepository $userRepository, UserInterface $customer, SerializerInterface $serializer, KngPagination $knpPagination)
     {
-        $users = $paginator->paginate(
-            $userRepository->findBy(["customer" => $customer]),
-            $request->query->getInt('page', 1),
-            self::LIMIT_MAX_BY_PAGE
-        );
-
-        // Make Link pagination
-        $route = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
-        $page = $users->getCurrentPageNumber(); 
-        $totalPhoneCount = $users->getTotalItemCount();
-        $maxPage = ceil($totalPhoneCount / self::LIMIT_MAX_BY_PAGE);
-
-        $pagination = $pagination->showPagination($route, $page, $totalPhoneCount, $maxPage);
-        $users[] = ["Pagination" => $pagination];
-
-        $users = $serializer->serialize($users, 'json', SerializationContext::create()->setGroups(array('Default', 'items' => array('list_users'))));
+        $users = $knpPagination->showPagination($userRepository->findBy(["customer" => $customer]), self::NUM_USERS_PER_PAGE, self::GROUP_JMS_LIST_USERS);
+        $users = $serializer->serialize($users, 'json');
         return  new JsonResponse($users, Response::HTTP_OK, [], true);
     }
 

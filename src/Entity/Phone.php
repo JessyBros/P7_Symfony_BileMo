@@ -42,6 +42,7 @@ class Phone
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Serializer\Groups({"list_phones", "show_phones"})
+     * @Groups("list_users")
      */
     private $id;
 
