@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
+use OpenApi\Annotations as OA;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -72,6 +73,7 @@ class User
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Serializer\Groups({"list_users", "show_users", "add_user"})
+     * @OA\Property(type="integer")
      */
     private $id;
 
@@ -83,7 +85,9 @@ class User
      *      min = 3,
      *      minMessage = "Le nom doit comporter au moins 3 caractères.",
      *      max = 50,
-     *      maxMessage = "Le nom ne doit pas excéder 50 caractères.")
+     *      maxMessage = "Le nom ne doit pas excéder 50 caractères."
+     * )
+     * @OA\Property(type="string", minLength=3, maxLength=50)
      */
     private $name;
 
@@ -94,6 +98,7 @@ class User
      * @Assert\Email(
      *     message = "Votre email '{{ value }}' n'est pas un email valid."
      * )
+     * @OA\Property(type="string", maxLength=255)
      */
     private $email;
 
@@ -102,6 +107,7 @@ class User
      * @Serializer\Groups({"show_users", "add_user"})
      * @Assert\NotBlank
      * @Assert\Positive
+     * @OA\Property(type="text", maxLength=255)
      */
     private $number;
 
