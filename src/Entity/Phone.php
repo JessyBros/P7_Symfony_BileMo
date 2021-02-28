@@ -6,6 +6,7 @@ use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation as Serializer;
+use OpenApi\Annotations as OA;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -40,42 +41,49 @@ class Phone
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Serializer\Groups({"list_phones", "show_phones"})
+     * @OA\Property(type="integer")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Serializer\Groups({"list_phones", "show_phones"})
+     * @OA\Property(type="string", maxLength=255)
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Serializer\Groups({"show_phones"})
+     * @OA\Property(type="string", maxLength=255)
      */
     private $description;
 
     /**
      * @ORM\Column(type="decimal", precision=6, scale=2)
      * @Serializer\Groups({"show_phones"})
+     * @OA\Property(type="decimal, 6 number for 2 scale", maxLength=6)
      */
     private $price;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Serializer\Groups({"show_phones"})
+     * @OA\Property(type="string", maxLength=255)
      */
     private $color;
 
     /**
      * @ORM\Column(type="decimal", precision=5, scale=2)
      * @Serializer\Groups({"show_phones"})
+     * @OA\Property(type="decimal, 5 number for 2 scale")
      */
     private $size;
 
     /**
      * @ORM\Column(type="integer")
      * @Serializer\Groups({"show_phones"})
+     * @OA\Property(type="integer")
      */
     private $weight;
 

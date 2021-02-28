@@ -9,6 +9,9 @@ use App\Service\KnpPagination;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +34,25 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users", name="users", methods={"GET"})
+     * @OA\Tag(name="User")
+     * @OA\Get(summary="Retrieves the collection of User resources.")
+      * @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     description="The collection page number",
+     *     @OA\Schema(type="string", default=1)
+     * )
+     * @OA\Response(
+     *     response=200,
+     *     description="User collection",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref="#/components/schemas/User_list")
+     *     )
+     * )
+     * @OA\Response(response=401, description="Token was expired or not found")
+     * @OA\Response(response=404, description="User not found")
+     * @Security(name="Bearer")
      */
     public function listUsers(KnpPagination $knpPagination,
                               Request $request,
@@ -56,6 +78,27 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id<[0-9]+>}", name="user", methods={"GET"})
      * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
+     * 
+     * @OA\Tag(name="User")
+     * @OA\Get(summary="Retrieves a User resource.")
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="Resource identifier",
+     *     allowEmptyValue="1",
+     *     @OA\Schema(type="integer")
+     * )
+     * @OA\Response(
+     *     response=200,
+     *     description="User resource",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref="#/components/schemas/User")
+     *     )
+     * )
+     * @OA\Response(response=401, description="Token was expired or not found")
+     * @OA\Response(response=404, description="User not found")
+     * @Security(name="Bearer")
      */
     public function showUser(SerializerInterface $serializer, User $user, UserRepository $userRepository)
     {
@@ -65,6 +108,40 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users", name="add_user", methods={"POST"})
+     * @OA\Tag(name="User")
+     * @OA\Post(summary="Creates a User resource.")
+     * @OA\RequestBody(
+     *         description="The new User resource",
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/Id+json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="name",
+     *                     type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="number",
+     *                     type="string"
+     *                 ),
+     *             )
+     *         ))
+     * @OA\Response(
+     *     response=204,
+     *     description="user resource created",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class, groups={"show_users"}))
+     *     )
+     * )
+     * @OA\Response(response=400, description="Invalid input")
+     * @OA\Response(response=401, description="Token was expired or not found")
+     * @Security(name="Bearer")
      */
     public function addUser(Request $request,
                             SerializerInterface $serializer,
@@ -101,6 +178,27 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id<[0-9]+>}", name="delete_user", methods={"DELETE"})
      * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
+     * @OA\Tag(name="User")
+     * @OA\Delete(summary="Removes the User resource.")
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="Resource identifier",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Response(
+     *     response=204,
+     *     description="user deleted"
+     * )
+     * @OA\Response(
+     *     response=401,
+     *     description="Token was expired or not found",
+     * )
+     * @OA\Response(
+     *     response=404,
+     *     description="No user was found",
+     * )
+     * @Security(name="Bearer")
      */
     public function deleteUser(User $user, EntityManagerInterface $manager)
     { 

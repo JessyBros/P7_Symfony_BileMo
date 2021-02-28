@@ -1,0 +1,24 @@
+# config/packages/nelmio_api_doc.yaml
+nelmio_api_doc:
+    areas:
+        path_patterns: # an array of regexps
+            - ^/api(?!/doc$)
+    documentation:
+        info:
+            title: BileMo
+            description: Votre application BileMo ! Consultez la liste des téléphones et gérez vos propres utilisateurs !
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []
+    models:
+        names:
+            - { alias: Phone, type: App\Entity\Phone, groups: [show_phones] }
+            - { alias: Phone_list, type: App\Entity\Phone, groups: [list_phones] }
+            - { alias: User, type: App\Entity\User, groups: [show_users] }
+            - { alias: User_list, type: App\Entity\User, groups: [list_users] }

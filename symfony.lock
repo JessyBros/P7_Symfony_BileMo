@@ -174,6 +174,9 @@
             "./config/packages/sensio_framework_extra.yaml"
         ]
     },
+    "symfony/asset": {
+        "version": "v5.2.3"
+    },
     "symfony/cache": {
         "version": "v5.2.1"
     },
@@ -373,6 +376,23 @@
     },
     "symfony/translation-contracts": {
         "version": "v2.3.0"
+    },
+    "symfony/twig-bridge": {
+        "version": "v5.2.3"
+    },
+    "symfony/twig-bundle": {
+        "version": "5.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "5.0",
+            "ref": "fab9149bbaa4d5eca054ed93f9e1b66cc500895d"
+        },
+        "files": [
+            "./config/packages/test/twig.yaml",
+            "./config/packages/twig.yaml",
+            "./templates/base.html.twig"
+        ]
     },
     "symfony/validator": {
         "version": "4.3",

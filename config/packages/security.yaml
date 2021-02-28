@@ -9,6 +9,9 @@ security:
         App\Entity\Customer:
             algorithm: auto
     firewalls:
+        api_doc:
+                pattern: ^/api/doc
+                security: false
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
