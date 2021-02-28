@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Customer;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
+use App\Service\KnpPagination;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,31 +13,39 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\SecurityContext;
-use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
+
 /**
  * @Route("/api")
  */
 class PhoneController extends AbstractController
 {
-    const LIMIT_MAX_BY_PAGE = 10;
+    const NUM_PHONES_PER_PAGE = 8;
+    const GROUP_JMS_LIST_PHONES = "list_phones";
 
     /**
      * @Route("/phones", name="phones", methods={"GET"})
      */
-    public function listPhones(PhoneRepository $phoneRepository, Request $request, PaginatorInterface $paginator, SerializerInterface $serializer): Response
-    {
-        $phones = $paginator->paginate(
+    public function listPhones(KnpPagination $knpPagination,
+                               PhoneRepository $phoneRepository,
+                               Request $request,
+                               SerializerInterface $serializer)
+    { 
+        $defaultPage = $request->query->getInt('page', 1);
+        $pathServer = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
+
+        $phones = $knpPagination->showPagination(
             $phoneRepository->findAll(),
-            $request->query->getInt('page', 1),
-            self::LIMIT_MAX_BY_PAGE
+            self::NUM_PHONES_PER_PAGE,
+            self::GROUP_JMS_LIST_PHONES,
+            $defaultPage,
+            $pathServer
         );
 
-        $phones = $serializer->serialize($phones, 'json', SerializationContext::create()->setGroups(array('Default', 'items' => array('list_phones'))));
+        $phones = $serializer->serialize($phones, 'json');
+        
         $response =  new JsonResponse($phones, Response::HTTP_OK, [], true);
-
-        $response->setPublic();
-        $response->setMaxAge(3600);
+        $response->setPublic()->setMaxAge(3600);
         return $response;
     }
 
@@ -46,9 +55,9 @@ class PhoneController extends AbstractController
     public function showPhone(Phone $phone, SerializerInterface $serializer)
     {
         $phone = $serializer->serialize($phone, 'json', SerializationContext::create()->setGroups(array('show_phones')));
+
         $response =  new JsonResponse($phone, Response::HTTP_OK, [], true);
-        $response->setPublic();
-        $response->setMaxAge(3600);
+        $response->setPublic()->setMaxAge(3600);
         return $response;
     }
 }

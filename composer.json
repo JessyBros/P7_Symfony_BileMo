@@ -27,7 +27,8 @@
         "symfony/proxy-manager-bridge": "5.2.*",
         "symfony/serializer": "5.2.*",
         "symfony/validator": "5.2.*",
-        "symfony/yaml": "5.2.*"
+        "symfony/yaml": "5.2.*",
+        "willdurand/hateoas-bundle": "^2.1"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",

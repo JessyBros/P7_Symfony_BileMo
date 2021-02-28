@@ -4,13 +4,34 @@ namespace App\Entity;
 
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation as Serializer;
-use Symfony\Component\Serializer\Annotation\Groups;
-
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
  * 
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "phone",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"list_phones"}
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "list",
+ *      href = @Hateoas\Route(
+ *          "phones",
+ *          absolute = true 
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(
+ *          groups={"show_phones"}
+ *      )
+ * )
  */
 class Phone
 {
@@ -18,7 +39,6 @@ class Phone
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"list_phones", "show_phones"})
      * @Serializer\Groups({"list_phones", "show_phones"})
      */
     private $id;
