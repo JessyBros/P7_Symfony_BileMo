@@ -7,8 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Annotations as OA;
-use Symfony\Component\Serializer\Annotation\Groups;
-
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -43,7 +41,6 @@ class Phone
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Serializer\Groups({"list_phones", "show_phones"})
-     * @Groups("list_users")
      * @OA\Property(type="integer")
      */
     private $id;
