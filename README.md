@@ -51,11 +51,14 @@ PROJECT 7 BileMo - API Application with Symfony
 
 ### Step 5 : Configure JWT token
 -   If you got some problem you can still check the official guide to configure JWT <https://github.com/lexik/LexikJWTAuthenticationBundle/blob/HEAD/Resources/doc/index.md>
+
     • write your pass_phrase password in the ".env.local" file.
 
-    • write commande to generate private key <code>openssl genrsa -out config/jwt/private.pem -aes256 512</code>
+    • create "jwt" folder in "config" folder
+
+    • create private.pem" file in "jwt" folder and write commande to generate private key <code>openssl genrsa -out config/jwt/private.pem -aes256 512</code>
     
-    • write command to generate public key <code>openssl rsa -in config/jwt/private.pem -pubout -out config/jwt/public.pem</code>
+    • create public.pem" file and in "jwt" folder write command to generate public key <code>openssl rsa -in config/jwt/private.pem -pubout -out config/jwt/public.pem</code>
 
 ### Step 5 : Run symfony server and open your project
 -   Run the project <code>symfony server:start</code>
