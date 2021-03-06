@@ -19,8 +19,8 @@ class ExceptionListener
 
         $message = json_encode(
             [
+                "code" => $code,
                 "message" =>$exception->getMessage(),
-                "code" => $code
             ]
         );
 
