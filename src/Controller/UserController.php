@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use App\Service\KnpPagination;
+use App\Service\UserSearch;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -57,14 +58,14 @@ class UserController extends AbstractController
     public function listUsers(KnpPagination $knpPagination,
                               Request $request,
                               SerializerInterface $serializer,
-                              UserRepository $userRepository,
+                              UserSearch $userSearch,
                               UserInterface $customer)
     {
         $pathServer = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
         $defaultPage = $request->query->getInt('page', 1);
 
         $users = $knpPagination->showPagination(
-            $userRepository->findBy(["customer" => $customer]),
+            $userSearch->findAllUsersBy(["customer" => $customer]),
             self::NUM_USERS_PER_PAGE,
             self::GROUP_JMS_LIST_USERS,
             $defaultPage,
@@ -77,8 +78,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id<[0-9]+>}", name="user", methods={"GET"})
-     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
-     * 
+     * @IsGranted("MANAGE", subject="id", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
      * @OA\Tag(name="User")
      * @OA\Get(summary="Retrieves a User resource.")
      * @OA\Parameter(
@@ -100,9 +100,9 @@ class UserController extends AbstractController
      * @OA\Response(response=404, description="User not found")
      * @Security(name="Bearer")
      */
-    public function showUser(SerializerInterface $serializer, User $user, UserRepository $userRepository)
+    public function showUser($id, SerializerInterface $serializer, UserSearch $userSearch)
     {
-        $user = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups('show_users'));
+        $user = $serializer->serialize($userSearch->findUserById($id), 'json', SerializationContext::create()->setGroups('show_users'));
         return new JsonResponse($user, Response::HTTP_OK, [], true);
     }
 
@@ -177,7 +177,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id<[0-9]+>}", name="delete_user", methods={"DELETE"})
-     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
+     * @IsGranted("MANAGE", subject="id", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
      * @OA\Tag(name="User")
      * @OA\Delete(summary="Removes the User resource.")
      * @OA\Parameter(
@@ -200,8 +200,10 @@ class UserController extends AbstractController
      * )
      * @Security(name="Bearer")
      */
-    public function deleteUser(User $user, EntityManagerInterface $manager)
+    public function deleteUser($id, EntityManagerInterface $manager, UserSearch $userSearch)
     { 
+        $user = $userSearch->findUserById($id);
+
         $manager->remove($user);
         $manager->flush();
         return new Response(null, Response::HTTP_NO_CONTENT);

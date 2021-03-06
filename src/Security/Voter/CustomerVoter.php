@@ -3,18 +3,22 @@
 namespace App\Security\Voter;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class CustomerVoter extends Voter
 {
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
     protected function supports($attribute, $subject)
     {
-        // replace with your own logic
-        // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, ['MANAGE'])
-            && $subject instanceof User;
+            && $subject;
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -26,7 +30,11 @@ class CustomerVoter extends Voter
             return false;
         }
 
-        // ... (check conditions and return true to grant permission) ...
+        $subject = $this->userRepository->findOneById($subject);
+        if(!$subject){
+            return true;
+        }
+        
         switch ($attribute) {
             case 'MANAGE':
                 if ($subject->getCustomer() == $user) {

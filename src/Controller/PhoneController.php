@@ -6,6 +6,7 @@ use App\Entity\Customer;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
 use App\Service\KnpPagination;
+use App\Service\PhoneSearch;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 
 /**
  * @Route("/api")
@@ -48,9 +49,10 @@ class PhoneController extends AbstractController
      * @OA\Response(response=401, description="Token was expired or not found")
      * @OA\Response(response=404, description="Phone not found")
      * @Security(name="Bearer")
+     * @Entity("Phone", expr="repository.findPhonesAll")
      */
     public function listPhones(KnpPagination $knpPagination,
-                               PhoneRepository $phoneRepository,
+                               PhoneSearch $phoneSearch,
                                Request $request,
                                SerializerInterface $serializer)
     { 
@@ -58,7 +60,7 @@ class PhoneController extends AbstractController
         $pathServer = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
 
         $phones = $knpPagination->showPagination(
-            $phoneRepository->findAll(),
+            $phoneSearch->findAllPhones(),
             self::NUM_PHONES_PER_PAGE,
             self::GROUP_JMS_LIST_PHONES,
             $defaultPage,
@@ -95,13 +97,12 @@ class PhoneController extends AbstractController
      * @OA\Response(response=404, description="Phone not found")
      * @Security(name="Bearer")
      */
-    public function showPhone(Phone $phone, SerializerInterface $serializer)
+    public function showPhone($id, PhoneSearch $phoneSearch, SerializerInterface $serializer)
     {
-        $phone = $serializer->serialize($phone, 'json', SerializationContext::create()->setGroups(array('show_phones')));
+        $phone = $serializer->serialize($phoneSearch->findPhoneById($id), 'json', SerializationContext::create()->setGroups(array('show_phones')));
 
         $response =  new JsonResponse($phone, Response::HTTP_OK, [], true);
         $response->setPublic()->setMaxAge(3600);
         return $response;
     }
 }
-namespace App\Form;
