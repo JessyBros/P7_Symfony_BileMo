@@ -31,10 +31,10 @@ class CustomerVoter extends Voter
         }
 
         $subject = $this->userRepository->findOneById($subject);
-        if(!$subject){
+        if (!$subject) {
             return true;
         }
-        
+
         switch ($attribute) {
             case 'MANAGE':
                 if ($subject->getCustomer() == $user) {

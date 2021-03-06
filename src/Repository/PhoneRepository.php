@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Phone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
 
 /**
  * @method Phone|null find($id, $lockMode = null, $lockVersion = null)
