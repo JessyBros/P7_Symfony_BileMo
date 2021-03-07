@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use App\Service\KnpPagination;
-use App\Service\UserSearch;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -15,26 +14,27 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 /**
  * @Route("/api")
  */
 class UserController extends AbstractController
 {
     const NUM_USERS_PER_PAGE = 5;
-    const GROUP_JMS_LIST_USERS = "list_users";
+    const GROUP_JMS_LIST_USERS = 'list_users';
 
     /**
      * @Route("/users", name="users", methods={"GET"})
      * @OA\Tag(name="User")
      * @OA\Get(summary="Retrieves the collection of User resources.")
-      * @OA\Parameter(
+     * @OA\Parameter(
      *     name="page",
      *     in="query",
      *     description="The collection page number",
@@ -58,11 +58,11 @@ class UserController extends AbstractController
                               UserRepository $userRepository,
                               UserInterface $customer)
     {
-        $pathServer = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
+        $pathServer = $request->server->get('SERVER_NAME').$request->getPathInfo().'?page=';
         $defaultPage = $request->query->getInt('page', 1);
 
         $users = $knpPagination->showPagination(
-            $userRepository->findBy(["customer" => $customer]),
+            $userRepository->findBy(['customer' => $customer]),
             self::NUM_USERS_PER_PAGE,
             self::GROUP_JMS_LIST_USERS,
             $defaultPage,
@@ -70,7 +70,8 @@ class UserController extends AbstractController
         );
 
         $users = $serializer->serialize($users, 'json');
-        return  new JsonResponse($users, Response::HTTP_OK, [], true);
+
+        return new JsonResponse($users, Response::HTTP_OK, [], true);
     }
 
     /**
@@ -100,6 +101,7 @@ class UserController extends AbstractController
     public function showUser(User $user, SerializerInterface $serializer, UserRepository $userRepository)
     {
         $user = $serializer->serialize($userRepository->find($user), 'json', SerializationContext::create()->setGroups('show_users'));
+
         return new JsonResponse($user, Response::HTTP_OK, [], true);
     }
 
@@ -153,8 +155,8 @@ class UserController extends AbstractController
             $user = $serializer->deserialize($jsonPost, User::class, 'json');
         } catch (NotEncodableValueException $e) {
             return $this->json([
-                "status" => Response::HTTP_BAD_REQUEST,
-                "message" => $e->getMessage()
+                'status' => Response::HTTP_BAD_REQUEST,
+                'message' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -163,12 +165,14 @@ class UserController extends AbstractController
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
             $errors = $serializer->serialize($errors, 'json');
+
             return new JsonResponse($errors, Response::HTTP_BAD_REQUEST, [], true);
         }
 
         $manager->persist($user);
         $manager->flush();
         $user = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups('add_user'));
+
         return new JsonResponse($user, Response::HTTP_CREATED, [], true);
     }
 
@@ -198,11 +202,12 @@ class UserController extends AbstractController
      * @Security(name="Bearer")
      */
     public function deleteUser(User $user, EntityManagerInterface $manager, UserRepository $userRepository)
-    { 
+    {
         $user = $userRepository->find($user);
 
         $manager->remove($user);
         $manager->flush();
+
         return new Response(null, Response::HTTP_NO_CONTENT);
     }
 }

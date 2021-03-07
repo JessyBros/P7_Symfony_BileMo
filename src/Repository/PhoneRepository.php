@@ -21,24 +21,26 @@ class PhoneRepository extends ServiceEntityRepository
         parent::__construct($registry, Phone::class);
     }
 
-    public function findAll(){
+    public function findAll()
+    {
         $phone = parent::findAll();
 
         if (!$phone) {
             throw new Exception("Aucun téléphone n'existe", Response::HTTP_NOT_FOUND);
         }
 
-        return $phone;       
+        return $phone;
     }
 
-    public function find($id, $lockMode = null, $lockVersion = null){
+    public function find($id, $lockMode = null, $lockVersion = null)
+    {
         $phone = parent::find($id, $lockMode, $lockVersion);
 
         if (!$phone) {
             throw new Exception("Le téléphone que vous recherchez n'existe pas", Response::HTTP_NOT_FOUND);
         }
 
-        return $phone;       
+        return $phone;
     }
 
     // /**

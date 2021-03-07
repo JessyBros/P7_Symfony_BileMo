@@ -17,8 +17,8 @@ class KnpPagination
         $this->serializer = $serializer;
     }
 
-    public function showPagination($listItem, $numItemsPerPage, $groupsJmsSerializer, $defaultPage, $pathServer){
-
+    public function showPagination($listItem, $numItemsPerPage, $groupsJmsSerializer, $defaultPage, $pathServer)
+    {
         // call kng pagination bundle
         $knpPagination = $this->knpPaginator->paginate(
             $listItem,
@@ -33,35 +33,33 @@ class KnpPagination
                         $this->serializer->serialize(
                             $knpPagination->getItems(),
                             'json',
-                            SerializationContext::create()->setGroups(array($groupsJmsSerializer))
+                            SerializationContext::create()->setGroups([$groupsJmsSerializer])
                         ),
                     true
                     );
 
         $linkPagination = [
-            "first" => $pathServer . "1",
-            "last" => $pathServer . $maxPage
+            'first' => $pathServer.'1',
+            'last' => $pathServer.$maxPage,
         ];
 
         if ($currentPage > 1 && $currentPage <= $maxPage) {
-
-            $previous = ["previous" => $pathServer . ($currentPage - 1)];
+            $previous = ['previous' => $pathServer.($currentPage - 1)];
             $linkPagination = array_merge($previous, $linkPagination);
-            
         }
 
         if ($currentPage < $maxPage) {
-            $next= ["next" => $pathServer . ($currentPage + 1)];
-            $linkPagination = array_merge( $linkPagination, $next);
+            $next = ['next' => $pathServer.($currentPage + 1)];
+            $linkPagination = array_merge($linkPagination, $next);
         }
 
         // create my own pagination with kng Pagination bundle
         $pagination = [
-            "current_page_number" => $currentPage,
-            "num_items_per_page" => $numItemsPerPage,
-            "total_item" => $totalItem, 
-            "items" =>  $items,
-            "_links" => $linkPagination
+            'current_page_number' => $currentPage,
+            'num_items_per_page' => $numItemsPerPage,
+            'total_item' => $totalItem,
+            'items' => $items,
+            '_links' => $linkPagination,
             ];
 
         return $pagination;
