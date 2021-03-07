@@ -55,14 +55,14 @@ class UserController extends AbstractController
     public function listUsers(KnpPagination $knpPagination,
                               Request $request,
                               SerializerInterface $serializer,
-                              UserSearch $userSearch,
+                              UserRepository $userRepository,
                               UserInterface $customer)
     {
         $pathServer = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
         $defaultPage = $request->query->getInt('page', 1);
 
         $users = $knpPagination->showPagination(
-            $userSearch->findAllUsersBy(["customer" => $customer]),
+            $userRepository->findBy(["customer" => $customer]),
             self::NUM_USERS_PER_PAGE,
             self::GROUP_JMS_LIST_USERS,
             $defaultPage,
@@ -75,7 +75,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id<[0-9]+>}", name="user", methods={"GET"})
-     * @IsGranted("MANAGE", subject="id", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
+     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
      * @OA\Tag(name="User")
      * @OA\Get(summary="Retrieves a User resource.")
      * @OA\Parameter(
@@ -97,9 +97,9 @@ class UserController extends AbstractController
      * @OA\Response(response=404, description="User not found")
      * @Security(name="Bearer")
      */
-    public function showUser($id, SerializerInterface $serializer, UserSearch $userSearch)
+    public function showUser(User $user, SerializerInterface $serializer, UserRepository $userRepository)
     {
-        $user = $serializer->serialize($userSearch->findUserById($id), 'json', SerializationContext::create()->setGroups('show_users'));
+        $user = $serializer->serialize($userRepository->find($user), 'json', SerializationContext::create()->setGroups('show_users'));
         return new JsonResponse($user, Response::HTTP_OK, [], true);
     }
 
@@ -174,7 +174,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id<[0-9]+>}", name="delete_user", methods={"DELETE"})
-     * @IsGranted("MANAGE", subject="id", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
+     * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour supprimer cet utilisateur")
      * @OA\Tag(name="User")
      * @OA\Delete(summary="Removes the User resource.")
      * @OA\Parameter(
@@ -197,9 +197,9 @@ class UserController extends AbstractController
      * )
      * @Security(name="Bearer")
      */
-    public function deleteUser($id, EntityManagerInterface $manager, UserSearch $userSearch)
+    public function deleteUser(User $user, EntityManagerInterface $manager, UserRepository $userRepository)
     { 
-        $user = $userSearch->findUserById($id);
+        $user = $userRepository->find($user);
 
         $manager->remove($user);
         $manager->flush();

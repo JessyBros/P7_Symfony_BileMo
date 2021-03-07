@@ -6,6 +6,7 @@ use App\Entity\Phone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @method Phone|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,6 +19,26 @@ class PhoneRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Phone::class);
+    }
+
+    public function findAll(){
+        $phone = parent::findAll();
+
+        if (!$phone) {
+            throw new Exception("Aucun téléphone n'existe", Response::HTTP_NOT_FOUND);
+        }
+
+        return $phone;       
+    }
+
+    public function find($id, $lockMode = null, $lockVersion = null){
+        $phone = parent::find($id, $lockMode, $lockVersion);
+
+        if (!$phone) {
+            throw new Exception("Le téléphone que vous recherchez n'existe pas", Response::HTTP_NOT_FOUND);
+        }
+
+        return $phone;       
     }
 
     // /**

@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
 use App\Service\KnpPagination;
-use App\Service\PhoneSearch;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -51,7 +50,7 @@ class PhoneController extends AbstractController
      * @Entity("Phone", expr="repository.findPhonesAll")
      */
     public function listPhones(KnpPagination $knpPagination,
-                               PhoneSearch $phoneSearch,
+                               PhoneRepository $phoneRepository,
                                Request $request,
                                SerializerInterface $serializer)
     { 
@@ -59,7 +58,7 @@ class PhoneController extends AbstractController
         $pathServer = $request->server->get('SERVER_NAME') . $request->getPathInfo() . "?page=";
 
         $phones = $knpPagination->showPagination(
-            $phoneSearch->findAllPhones(),
+            $phoneRepository->findAll(),
             self::NUM_PHONES_PER_PAGE,
             self::GROUP_JMS_LIST_PHONES,
             $defaultPage,
@@ -96,9 +95,9 @@ class PhoneController extends AbstractController
      * @OA\Response(response=404, description="Phone not found")
      * @Security(name="Bearer")
      */
-    public function showPhone($id, PhoneSearch $phoneSearch, SerializerInterface $serializer)
+    public function showPhone(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
-        $phone = $serializer->serialize($phoneSearch->findPhoneById($id), 'json', SerializationContext::create()->setGroups(array('show_phones')));
+        $phone = $serializer->serialize($phoneRepository->find($phone), 'json', SerializationContext::create()->setGroups(array('show_phones')));
 
         $response =  new JsonResponse($phone, Response::HTTP_OK, [], true);
         $response->setPublic()->setMaxAge(3600);
