@@ -14,7 +14,40 @@ nelmio_api_doc:
                     type: apiKey
                     description: 'Value: Bearer {Json Web Token}'
                     name: Authorization
-                    in: header                    
+                    in: header
+        paths:
+            /api/login_check:
+                post:
+                    summary: 'Login into the api with a JWT'
+                    tags:
+                        - Login
+                    requestBody:
+                        description: 'Customer resource'
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        username:
+                                            type: string
+                                        password:
+                                            type: string
+                                    type: object
+                    responses:
+                        200:
+                            description: get json web token
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                        400:
+                            description: Invalid JSON
+                        401:
+                            description: Invalid credentials
+                    security: []
         security:
             - Bearer: []
     models:
@@ -23,3 +56,4 @@ nelmio_api_doc:
             - { alias: Phone_list, type: App\Entity\Phone, groups: [list_phones] }
             - { alias: User, type: App\Entity\User, groups: [show_users] }
             - { alias: User_list, type: App\Entity\User, groups: [list_users] }
+          
