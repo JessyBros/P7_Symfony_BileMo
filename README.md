@@ -56,9 +56,9 @@ PROJECT 7 BileMo - API Application with Symfony
 
     • create "jwt" folder in "config" folder
 
-    • create private.pem" file in "jwt" folder and write commande to generate private key <code>openssl genrsa -out config/jwt/private.pem -aes256 512</code>
+    • create private.pem" file in "jwt" folder and write commande to generate private key <code>openssl genpkey -out config/jwt/private.pem -pass stdin -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096</code>
     
-    • create public.pem" file and in "jwt" folder write command to generate public key <code>openssl rsa -in config/jwt/private.pem -pubout -out config/jwt/public.pem</code>
+    • create public.pem" file and in "jwt" folder write command to generate public key <code>openssl pkey -in config/jwt/private.pem -passin stdin -out config/jwt/public.pem -pubout</code>
 
-### Step 5 : Run symfony server and open your project
+### Step 6 : Run symfony server and open your project
 -   Run the project <code>symfony server:start</code>
