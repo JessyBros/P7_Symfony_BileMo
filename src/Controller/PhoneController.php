@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Customer;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
 use App\Service\KnpPagination;
@@ -11,13 +10,13 @@ use JMS\Serializer\SerializationContext;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
-
 
 /**
  * @Route("/api")
@@ -48,6 +47,7 @@ class PhoneController extends AbstractController
      * @OA\Response(response=401, description="Token was expired or not found")
      * @OA\Response(response=404, description="Phone not found")
      * @Security(name="Bearer")
+     * @Entity("Phone", expr="repository.findPhonesAll")
      */
     public function listPhones(KnpPagination $knpPagination,
                                PhoneRepository $phoneRepository,
@@ -95,13 +95,12 @@ class PhoneController extends AbstractController
      * @OA\Response(response=404, description="Phone not found")
      * @Security(name="Bearer")
      */
-    public function showPhone(Phone $phone, SerializerInterface $serializer)
+    public function showPhone(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
-        $phone = $serializer->serialize($phone, 'json', SerializationContext::create()->setGroups(array('show_phones')));
+        $phone = $serializer->serialize($phoneRepository->find($phone), 'json', SerializationContext::create()->setGroups(array('show_phones')));
 
         $response =  new JsonResponse($phone, Response::HTTP_OK, [], true);
         $response->setPublic()->setMaxAge(3600);
         return $response;
     }
 }
-namespace App\Form;

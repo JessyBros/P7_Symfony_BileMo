@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use App\Service\KnpPagination;
+use App\Service\UserSearch;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -21,9 +22,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
 /**
  * @Route("/api")
  */
@@ -78,7 +76,6 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id<[0-9]+>}", name="user", methods={"GET"})
      * @IsGranted("MANAGE", subject="user", statusCode=403, message="Vous n'avez pas l'autorisation pour consulter les détails de cet utilisateur")
-     * 
      * @OA\Tag(name="User")
      * @OA\Get(summary="Retrieves a User resource.")
      * @OA\Parameter(
@@ -100,9 +97,9 @@ class UserController extends AbstractController
      * @OA\Response(response=404, description="User not found")
      * @Security(name="Bearer")
      */
-    public function showUser(SerializerInterface $serializer, User $user, UserRepository $userRepository)
+    public function showUser(User $user, SerializerInterface $serializer, UserRepository $userRepository)
     {
-        $user = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups('show_users'));
+        $user = $serializer->serialize($userRepository->find($user), 'json', SerializationContext::create()->setGroups('show_users'));
         return new JsonResponse($user, Response::HTTP_OK, [], true);
     }
 
@@ -200,8 +197,10 @@ class UserController extends AbstractController
      * )
      * @Security(name="Bearer")
      */
-    public function deleteUser(User $user, EntityManagerInterface $manager)
+    public function deleteUser(User $user, EntityManagerInterface $manager, UserRepository $userRepository)
     { 
+        $user = $userRepository->find($user);
+
         $manager->remove($user);
         $manager->flush();
         return new Response(null, Response::HTTP_NO_CONTENT);
