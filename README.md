@@ -60,8 +60,5 @@ PROJECT 7 BileMo - API Application with Symfony
     
     • create public.pem" file and in "jwt" folder write command to generate public key <code>openssl pkey -in config/jwt/private.pem -passin stdin -out config/jwt/public.pem -pubout</code>
 
-### Step 5 : Run symfony server and open your project
+### Step 6 : Run symfony server and open your project
 -   Run the project <code>symfony server:start</code>
-
-### Step 6 : Documentation
--   If you need some help, go to the path "/api/doc" and check the documentation
