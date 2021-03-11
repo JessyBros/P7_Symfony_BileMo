@@ -10,24 +10,24 @@ use OpenApi\Annotations as OA;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
- * 
+ *
  * @Hateoas\Relation(
  *      "self",
  *      href = @Hateoas\Route(
  *          "phone",
  *          parameters = { "id" = "expr(object.getId())" },
- *          absolute = true 
+ *          absolute = true
  *      ),
  *      exclusion = @Hateoas\Exclusion(
  *          groups={"list_phones"}
  *      )
  * )
- * 
+ *
  * @Hateoas\Relation(
  *      "list",
  *      href = @Hateoas\Route(
  *          "phones",
- *          absolute = true 
+ *          absolute = true
  *      ),
  *      exclusion = @Hateoas\Exclusion(
  *          groups={"show_phones"}

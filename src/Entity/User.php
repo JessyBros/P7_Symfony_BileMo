@@ -4,12 +4,11 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Annotations as OA;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -18,47 +17,47 @@ use Symfony\Component\Validator\Constraints as Assert;
  *  fields={"email"},
  *  message = "L'email que vous indiqué est déjà utilisé !"
  * )
- * 
+ *
  * @Hateoas\Relation(
  *      "self",
  *      href = @Hateoas\Route(
  *          "user",
  *          parameters = { "id" = "expr(object.getId())" },
- *          absolute = true 
+ *          absolute = true
  *      ),
  *      exclusion = @Hateoas\Exclusion(
  *          groups={"list_users", "add_user"}
  *      )
  * )
- * 
+ *
  * @Hateoas\Relation(
  *      "list",
  *      href = @Hateoas\Route(
  *          "users",
- *          absolute = true 
+ *          absolute = true
  *      ),
  *      exclusion = @Hateoas\Exclusion(
  *          groups={"show_users", "add_user"}
  *      )
  * )
- * 
+ *
  * @Hateoas\Relation(
  *      "create",
  *      href = @Hateoas\Route(
  *          "add_user",
- *          absolute = true 
+ *          absolute = true
  *      ),
  *      exclusion = @Hateoas\Exclusion(
  *          groups={"list_users", "show_users"}
  *      )
  * )
- * 
+ *
  * @Hateoas\Relation(
  *      "remove",
  *      href = @Hateoas\Route(
  *          "delete_user",
  *          parameters = { "id" = "expr(object.getId())" },
- *          absolute = true 
+ *          absolute = true
  *      ),
  *      exclusion = @Hateoas\Exclusion(
  *          groups={"list_users", "show_users", "add_user"}
