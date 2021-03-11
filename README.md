@@ -1,4 +1,7 @@
 # P7_Symfony_BileMo
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7828d6fe49e04b90b5402cf033b2d964)](https://app.codacy.com/gh/SiProdZz/P7_Symfony_BileMo?utm_source=github.com&utm_medium=referral&utm_content=SiProdZz/P7_Symfony_BileMo&utm_campaign=Badge_Grade_Settings)
+
 PROJECT 7 BileMo - API Application with Symfony
 
 ## OBJECTIF 
