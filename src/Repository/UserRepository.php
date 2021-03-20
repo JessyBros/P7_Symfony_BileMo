@@ -23,13 +23,8 @@ class UserRepository extends ServiceEntityRepository
 
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
-        $user = parent::findBy($criteria, $orderBy, $limit, $offset);
-
-        if (!$user) {
-            throw new Exception("Aucun utilisateur n'existe", Response::HTTP_NOT_FOUND);
-        }
-
-        return $user;
+        $users = parent::findBy($criteria, $orderBy, $limit, $offset);
+        return $users;
     }
 
     public function find($id, $lockMode = null, $lockVersion = null)
