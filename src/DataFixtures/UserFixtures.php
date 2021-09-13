@@ -30,6 +30,15 @@ class UserFixtures extends Fixture
             $manager->persist($user);
         }
 
+        for ($i = 0; $i < 5; ++$i) {
+            $user = new User();
+            $user->setName($faker->name())
+                ->setEmail($faker->email())
+                ->setNumber($faker->serviceNumber())
+                ->setCustomer($this->getReference('customerEurekaci'));
+            $manager->persist($user);
+        }
+
         $manager->flush();
     }
 }

@@ -30,8 +30,15 @@ class CustomerFixtures extends Fixture
             ->setPassword($this->passwordEncoder->encodePassword($customerKokoBeats, 'KokoBeatsPassword'));
         $manager->persist($customerKokoBeats);
 
+        $eurekaci = new Customer();
+        $eurekaci->setUsername('Eurekaci')
+            ->setEmail('contact@eurekaci.com')
+            ->setPassword($this->passwordEncoder->encodePassword($eurekaci, 'admin'));
+        $manager->persist($eurekaci);
+
         $manager->flush();
         $this->addReference('customerSmartfox', $customerSmartfox);
         $this->addReference('customerKokoBeats', $customerKokoBeats);
+        $this->addReference('customerEurekaci', $eurekaci);
     }
 }
