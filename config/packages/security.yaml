@@ -1,5 +1,4 @@
 security:
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         customers:
             entity:
@@ -26,6 +25,7 @@ security:
         api:
             pattern:   ^/api
             stateless: true
+            anonymous: false
             guard:
                 authenticators:
                     - lexik_jwt_authentication.jwt_token_authenticator
