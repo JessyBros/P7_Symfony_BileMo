@@ -68,7 +68,7 @@
         },
         "post-install-cmd": [
             "@auto-scripts",
-            "php bin/console lexik:jwt:generate-keypair/"
+            "php bin/console lexik:jwt:generate-keypair"
         ],
         "post-update-cmd": [
             "@auto-scripts"
